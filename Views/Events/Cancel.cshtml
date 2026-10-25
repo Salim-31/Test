@@ -1,0 +1,23 @@
+@model Test.Models.EventRecord
+@{
+    ViewData["Title"] = "Cancel Event";
+}
+
+<h1 class="h3 mb-4">Cancel Event</h1>
+
+<div class="alert alert-warning">
+    Are you sure you want to cancel <strong>@Model.Name</strong> on @Model.EventDate.ToString("MMMM dd, yyyy")?
+    Your supplier bookings for this event will be cancelled too. The event record is kept for reference.
+</div>
+
+<form asp-action="Cancel" method="post" class="col-md-6">
+    <input type="hidden" name="id" value="@Model.Id" />
+
+    <div class="mb-3">
+        <label class="form-label">Reason (optional)</label>
+        <textarea name="reason" class="form-control" rows="3"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-danger">Yes, Cancel Event</button>
+    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">No, Go Back</a>
+</form>

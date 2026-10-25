@@ -1,0 +1,64 @@
+@using Test.Models
+@{
+    ViewData["Title"] = "Organizer";
+
+    var organizer = (Organizer)ViewBag.Organizer;
+    var suppliers = (List<Supplier>)ViewBag.Suppliers;
+    var services = (List<SupplierService>)ViewBag.Services;
+}
+
+<h1 class="h3 mb-1">Organizer Home</h1>
+<p class="text-muted">Logged in as: <strong>@organizer.Name</strong></p>
+
+<p class="small">
+    Switch organizer (testing only):
+    @foreach (var o in Test.Controllers.OrganizerController.organizers)
+    {
+        <a asp-action="Index" asp-route-organizerId="@o.Id" class="me-2">@o.Name</a>
+    }
+</p>
+
+<h2 class="h5 mt-4">Partner Suppliers</h2>
+@if (!suppliers.Any())
+{
+    <div class="alert alert-info">No partner suppliers yet.</div>
+}
+else
+{
+    <ul>
+        @foreach (var s in suppliers)
+        {
+            <li>@s.Name (@s.Email)</li>
+        }
+    </ul>
+}
+
+<h2 class="h5 mt-4">Services You Can Use in Packages</h2>
+@if (!services.Any())
+{
+    <div class="alert alert-info">No services available.</div>
+}
+else
+{
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Service</th>
+                <th>Supplier</th>
+                <th>Description</th>
+                <th class="text-end">Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in services)
+            {
+                <tr>
+                    <td class="fw-semibold">@s.Name</td>
+                    <td>@suppliers.FirstOrDefault(x => x.Id == s.SupplierId)?.Name</td>
+                    <td>@s.Description</td>
+                    <td class="text-end">₱@s.Price.ToString("N2")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

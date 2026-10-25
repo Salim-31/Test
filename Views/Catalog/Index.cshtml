@@ -1,0 +1,83 @@
+@using Test.Models
+@{
+    ViewData["Title"] = "Book Services";
+
+    var ev = (EventRecord)ViewBag.Event;
+    var packages = (List<EventPackage>)ViewBag.Packages;
+    var services = (List<SupplierService>)ViewBag.Services;
+    var suppliers = (List<Supplier>)ViewBag.Suppliers;
+    var allServices = Test.Controllers.CatalogController.services;
+}
+
+<h1 class="h3 mb-1">Book for: @ev.Name</h1>
+<p class="text-muted mb-4">
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+    @ev.EventDate.ToString("MMMM dd, yyyy") | Budget: ₱@ev.TotalBudget.ToString("N2") | Remaining: ₱@ev.RemainingBudget.ToString("N2")
+</p>
+
+<h2 class="h5">Packages</h2>
+<div class="row g-3 mb-5">
+    @foreach (var p in packages)
+    {
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6">@p.Name</h3>
+                    <p class="text-muted small">@p.Description</p>
+                    <p class="small mb-2">
+                        <strong>Includes:</strong>
+                        @string.Join(", ", allServices.Where(s => p.ServiceIds.Contains(s.Id)).Select(s => s.Name))
+                    </p>
+                    <p class="fw-bold">₱@p.Price.ToString("N2")</p>
+                </div>
+                <div class="card-footer bg-white">
+                    <form asp-action="BookPackage" method="post">
+                        <input type="hidden" name="eventId" value="@ev.Id" />
+                        <input type="hidden" name="packageId" value="@p.Id" />
+                        <button type="submit" class="btn btn-primary btn-sm">Book Package</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<h2 class="h5">Individual Services</h2>
+<table class="table align-middle">
+    <thead>
+        <tr>
+            <th>Service</th>
+            <th>Supplier</th>
+            <th>Description</th>
+            <th class="text-end">Price</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var s in services)
+        {
+            <tr>
+                <td class="fw-semibold">@s.Name</td>
+                <td>@suppliers.FirstOrDefault(x => x.Id == s.SupplierId)?.Name</td>
+                <td>@s.Description</td>
+                <td class="text-end">₱@s.Price.ToString("N2")</td>
+                <td class="text-end">
+                    <form asp-action="BookService" method="post">
+                        <input type="hidden" name="eventId" value="@ev.Id" />
+                        <input type="hidden" name="serviceId" value="@s.Id" />
+                        <button type="submit" class="btn btn-outline-primary btn-sm">Book</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="btn btn-outline-secondary">Back to Event</a>
