@@ -1,0 +1,68 @@
+@using Test.Models
+@model List<SupplierService>
+
+@{
+    ViewData["Title"] = "My Services";
+    var supplier = ViewBag.Supplier as Supplier;
+}
+
+<h2>My Services</h2>
+<a asp-action="Index" asp-route-supplierId="@supplier?.Id" class="btn btn-outline-secondary mb-3">Back to Bookings</a>
+
+@if (supplier != null)
+{
+    <h4>@supplier.Name</h4>
+}
+
+<a asp-action="AddService"
+   asp-route-supplierId="@supplier?.Id"
+   class="btn btn-primary mb-3">
+    Add Service
+</a>
+
+@if (Model == null || !Model.Any())
+{
+    <p>No services available.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Service Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var service in Model)
+            {
+                <tr>
+                    <td>@service.Name</td>
+                    <td>@service.Description</td>
+                    <td>₱@service.Price.ToString("N2")</td>
+                    <td>
+                        <a asp-action="EditService"
+                           asp-route-id="@service.Id"
+                           asp-route-supplierId="@supplier?.Id"
+                           class="btn btn-warning btn-sm">
+                            Edit
+                        </a>
+
+                        <form asp-action="DeleteService"
+                              method="post"
+                              class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@service.Id" />
+                            <input type="hidden" name="supplierId" value="@supplier?.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

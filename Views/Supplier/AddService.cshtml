@@ -1,0 +1,32 @@
+@using Test.Models
+@model SupplierService
+
+@{
+    ViewData["Title"] = "Add Service";
+}
+
+<h2>Add Service</h2>
+
+<form asp-action="AddService" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="SupplierId" value="@ViewBag.SupplierId" />
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Service Name</label>
+        <input asp-for="Name" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Description</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Price" class="form-label">Price</label>
+        <input asp-for="Price" type="number" step="0.01" min="0" class="form-control" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Service</button>
+    <a asp-action="Services" asp-route-supplierId="@ViewBag.SupplierId" class="btn btn-secondary">Cancel</a>
+</form>

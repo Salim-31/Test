@@ -1,67 +1,69 @@
-@model List<Test.Models.SupplierBooking>
 @using Test.Models
+@model List<SupplierBooking>
+
 @{
-    ViewData["Title"] = "Supplier Bookings";
-    var supplier = (Supplier)ViewBag.Supplier;
+    ViewData["Title"] = "Supplier Dashboard";
+    var supplier = ViewBag.Supplier as Supplier;
 }
 
-<h1 class="h3 mb-1">Booking Requests</h1>
-<p class="text-muted">Logged in as: <strong>@supplier.Name</strong></p>
+<h2>Supplier Dashboard</h2>
+<a asp-action="Services" asp-route-supplierId="@supplier?.Id" class="btn btn-outline-primary mb-3">My Services</a>
 
-<p class="small">
-    Switch supplier (testing only):
-    @foreach (var s in Test.Controllers.CatalogController.suppliers)
-    {
-        <a asp-action="Index" asp-route-supplierId="@s.Id" class="me-2">@s.Name</a>
-    }
-</p>
+@if (supplier != null)
+{
+    <h4>@supplier.Name</h4>
+    <p>Email: @supplier.Email</p>
+    <p>Phone: @supplier.Phone</p>
+}
+
+<hr />
+
+<h3>My Bookings</h3>
 
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger">@TempData["Error"]</div>
+    <p style="color: red;">@TempData["Error"]</p>
 }
 
-@if (!Model.Any())
+@if (Model == null || !Model.Any())
 {
-    <div class="alert alert-info">No booking requests yet.</div>
+    <p>No bookings available.</p>
 }
 else
 {
-    <table class="table align-middle">
+    <table class="table">
         <thead>
             <tr>
-                <th>Event</th>
                 <th>Service</th>
-                <th>Date</th>
+                <th>Booking Date</th>
                 <th>Time</th>
-                <th class="text-end">Price</th>
+                <th>Price</th>
                 <th>Status</th>
-                <th></th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var b in Model)
+            @foreach (var booking in Model)
             {
-                var ev = Test.Controllers.EventsController.events.FirstOrDefault(e => e.Id == b.EventId);
                 <tr>
-                    <td>@ev?.Name</td>
-                    <td>@b.ServiceName @(b.IsFromPackage ? "(package)" : "")</td>
-                    <td>@b.BookingDate.ToString("MMM dd, yyyy")</td>
-                    <td>@b.StartTime.ToString(@"hh\:mm") - @b.EndTime.ToString(@"hh\:mm")</td>
-                    <td class="text-end">₱@b.Price.ToString("N2")</td>
-                    <td>@b.Status</td>
-                    <td class="text-end">
-                        @if (b.Status == BookingStatus.Pending)
+                    <td>@booking.ServiceName</td>
+                    <td>@booking.BookingDate.ToString("MMM dd, yyyy")</td>
+                    <td>@booking.StartTime - @booking.EndTime</td>
+                    <td>₱@booking.Price.ToString("N2")</td>
+                    <td>@booking.Status</td>
+                    <td>
+                        @if (booking.Status == BookingStatus.Pending)
                         {
-                            <form asp-action="Accept" method="post" class="d-inline">
-                                <input type="hidden" name="bookingId" value="@b.Id" />
-                                <input type="hidden" name="supplierId" value="@supplier.Id" />
-                                <button type="submit" class="btn btn-sm btn-success">Accept</button>
+                            <form asp-action="Accept" method="post">
+                                <input type="hidden" name="bookingId" value="@booking.Id" />
+                                <input type="hidden" name="supplierId" value="@supplier?.Id" />
+                                <button type="submit" class="btn btn-success btn-sm">Accept</button>
                             </form>
-                            <form asp-action="Decline" method="post" class="d-inline">
-                                <input type="hidden" name="bookingId" value="@b.Id" />
-                                <input type="hidden" name="supplierId" value="@supplier.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Decline</button>
+
+                            <form asp-action="Decline" method="post">
+                                <input type="hidden" name="bookingId" value="@booking.Id" />
+                                <input type="hidden" name="supplierId" value="@supplier?.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm">Decline</button>
                             </form>
                         }
                     </td>
