@@ -1,0 +1,76 @@
+@model List<Test.Models.EventPackage>
+@using Test.Models
+@{
+    ViewData["Title"] = "My Packages";
+
+    var organizer = (Organizer)ViewBag.Organizer;
+    var services = (List<SupplierService>)ViewBag.Services;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h1 class="h3 mb-0">My Packages</h1>
+    <a asp-action="CreatePackage" asp-route-organizerId="@organizer.Id" class="btn btn-primary">+ Create Package</a>
+</div>
+
+<p class="text-muted">Logged in as: <strong>@organizer.Name</strong></p>
+
+<p class="small">
+    Switch organizer (testing only):
+    @foreach (var o in Test.Controllers.OrganizerController.organizers)
+    {
+        <a asp-action="Packages" asp-route-organizerId="@o.Id" class="me-2">@o.Name</a>
+    }
+</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">You have no packages yet.</div>
+}
+else
+{
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Package</th>
+                <th>Includes</th>
+                <th class="text-end">Price</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td>
+                        <div class="fw-semibold">@p.Name</div>
+                        <div class="text-muted small">@p.Description</div>
+                    </td>
+                    <td>@string.Join(", ", services.Where(s => p.ServiceIds.Contains(s.Id)).Select(s => s.Name))</td>
+                    <td class="text-end">₱@p.Price.ToString("N2")</td>
+                    <td>
+                        @if (p.IsPublished)
+                        {
+                            <span class="badge bg-success">Published</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Draft</span>
+                        }
+                    </td>
+                    <td class="text-end">
+                        <form asp-action="TogglePublish" method="post" class="d-inline">
+                            <input type="hidden" name="packageId" value="@p.Id" />
+                            <input type="hidden" name="organizerId" value="@organizer.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                @(p.IsPublished ? "Unpublish" : "Publish")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a asp-action="Index" asp-route-organizerId="@organizer.Id" class="btn btn-outline-secondary">Back</a>

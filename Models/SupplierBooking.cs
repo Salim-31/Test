@@ -1,8 +1,5 @@
 namespace Test.Models;
 
-// One booking = one supplier service on one event.
-// Booking a package creates one booking per service in it, all with the same PackageId,
-// so each supplier accepts or declines their own part.
 public class SupplierBooking
 {
     public int Id { get; set; }

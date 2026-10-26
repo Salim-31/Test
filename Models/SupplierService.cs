@@ -1,6 +1,5 @@
 namespace Test.Models;
 
-// A service a supplier offers, e.g. "Sound system and catering"
 public class SupplierService
 {
     public int Id { get; set; }
